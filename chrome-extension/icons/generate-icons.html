@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Extension Icons</title>
+</head>
+<body>
+  <h1>Extension Icon Generator</h1>
+  <p>Icons will download automatically when you open this page</p>
+  
+  <canvas id="canvas16" width="16" height="16" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+  <canvas id="canvas48" width="48" height="48" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+  <canvas id="canvas128" width="128" height="128" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+
+  <script>
+    function generateIcon(size) {
+      const canvas = document.getElementById(`canvas${size}`);
+      const ctx = canvas.getContext('2d');
+      
+      // Create gradient background
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      
+      // Fill background
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // Draw simple icon (stacked layers)
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = Math.max(2, size / 16);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      const padding = size * 0.2;
+      const height = size * 0.15;
+      
+      // Top layer
+      ctx.beginPath();
+      ctx.moveTo(padding, padding + height);
+      ctx.lineTo(size / 2, padding);
+      ctx.lineTo(size - padding, padding + height);
+      ctx.stroke();
+      
+      // Middle layer
+      ctx.beginPath();
+      ctx.moveTo(padding, size / 2);
+      ctx.lineTo(size - padding, size / 2);
+      ctx.stroke();
+      
+      // Bottom layer
+      ctx.beginPath();
+      ctx.moveTo(padding, size - padding - height);
+      ctx.lineTo(size / 2, size - padding);
+      ctx.lineTo(size - padding, size - padding - height);
+      ctx.stroke();
+      
+      // Download
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon${size}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Generate all icons after page loads
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        generateIcon(16);
+        setTimeout(() => generateIcon(48), 100);
+        setTimeout(() => generateIcon(128), 200);
+      }, 500);
+    });
+  </script>
+</body>
+</html>
